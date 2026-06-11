@@ -1,0 +1,124 @@
+<Sysmon schemaversion="4.82">
+  <!--
+    Detection Engineering Lab - Custom Sysmon Configuration
+    Tuned for the 12 simulated MITRE ATT&CK techniques.
+    Author: Detection Engineering Lab (Portfolio Upgrade)
+    References: Based on SwiftOnSecurity Sysmon Template, optimized for education/lab use.
+  -->
+  <HashAlgorithms>md5,sha256,imphash</HashAlgorithms>
+  <EventFiltering>
+
+    <!-- EVENT ID 1: Process Creation -->
+    <!-- Log all process creations by default to catch execution techniques (T1059, T1047, T1105, T1082, T1018) -->
+    <ProcessCreate onmatch="exclude">
+      <!-- Exclude noisy, standard Windows background processes to keep log volume reasonable -->
+      <ParentImage condition="is">C:\Windows\System32\SearchProtocolHost.exe</ParentImage>
+      <Image condition="is">C:\Windows\System32\audiodg.exe</Image>
+      <Image condition="is">C:\Windows\System32\conhost.exe</Image>
+      <Image condition="is">C:\Windows\System32\wbem\WmiPrvSE.exe</Image>
+      <ParentImage condition="is">C:\Windows\System32\wbem\WmiPrvSE.exe</ParentImage>
+      <CommandLine condition="contains">Google\Update\GoogleUpdate.exe</CommandLine>
+    </ProcessCreate>
+
+    <!-- EVENT ID 3: Network Connection -->
+    <!-- Log network connections from specific utilities commonly used for C2, downloads, or lateral movement (T1105, T1021) -->
+    <NetworkConnect onmatch="include">
+      <Image condition="image">certutil.exe</Image>
+      <Image condition="image">bitsadmin.exe</Image>
+      <Image condition="image">powershell.exe</Image>
+      <Image condition="image">cmd.exe</Image>
+      <Image condition="image">wscript.exe</Image>
+      <Image condition="image">cscript.exe</Image>
+      <Image condition="image">mshta.exe</Image>
+      <Image condition="image">curl.exe</Image>
+      <Image condition="image">mstsc.exe</Image>
+    </NetworkConnect>
+
+    <!-- EVENT ID 7: Image Load (DLL) -->
+    <!-- Monitor loading of specific DLLs used in credential dumping or process hollowing (T1003.001, T1055.001) -->
+    <ImageLoad onmatch="include">
+      <!-- comsvcs.dll is commonly abused to dump LSASS memory via rundll32 -->
+      <ImageLoaded condition="ends with">comsvcs.dll</ImageLoaded>
+      <!-- samlib.dll or vaultcli.dll loaded by non-standard processes -->
+      <ImageLoaded condition="ends with">samlib.dll</ImageLoaded>
+      <ImageLoaded condition="ends with">vaultcli.dll</ImageLoaded>
+    </ImageLoad>
+    <ImageLoad onmatch="exclude">
+      <!-- Exclude standard system processes loading samlib/vaultcli to reduce noise -->
+      <Image condition="is">C:\Windows\System32\lsass.exe</Image>
+      <Image condition="is">C:\Windows\System32\svchost.exe</Image>
+    </ImageLoad>
+
+    <!-- EVENT ID 8: CreateRemoteThread (Process Injection) -->
+    <!-- Critical for Process Injection (T1055). Monitor cross-process thread injection. -->
+    <CreateRemoteThread onmatch="include">
+      <!-- Monitor cross-process threads created by common interpreters/LOLBins -->
+      <SourceImage condition="image">powershell.exe</SourceImage>
+      <SourceImage condition="image">cmd.exe</SourceImage>
+      <SourceImage condition="image">wscript.exe</SourceImage>
+      <SourceImage condition="image">cscript.exe</SourceImage>
+      <SourceImage condition="image">mshta.exe</SourceImage>
+      <!-- Monitor injections into critical target processes -->
+      <TargetImage condition="image">lsass.exe</TargetImage>
+      <TargetImage condition="image">svchost.exe</TargetImage>
+      <TargetImage condition="image">explorer.exe</TargetImage>
+      <TargetImage condition="image">spoolsv.exe</TargetImage>
+    </CreateRemoteThread>
+    <CreateRemoteThread onmatch="exclude">
+      <!-- Exclude standard Windows subsystem self-injections -->
+      <SourceImage condition="is">C:\Windows\System32\csrss.exe</SourceImage>
+      <SourceImage condition="is">C:\Windows\System32\winlogon.exe</SourceImage>
+    </CreateRemoteThread>
+
+    <!-- EVENT ID 10: ProcessAccess (LSASS Credential Dumping) -->
+    <!-- Critical for LSASS Credential Dumping (T1003.001). Monitor handle creation to LSASS. -->
+    <ProcessAccess onmatch="include">
+      <!-- Target image must be LSASS to catch memory readers (Procdump, Mimikatz) -->
+      <TargetImage condition="is">C:\Windows\System32\lsass.exe</TargetImage>
+    </ProcessAccess>
+    <ProcessAccess onmatch="exclude">
+      <!-- Exclude legitimate Windows LSA readers to avoid flooding -->
+      <SourceImage condition="is">C:\Windows\System32\rasserver.exe</SourceImage>
+      <SourceImage condition="is">C:\Windows\System32\wininit.exe</SourceImage>
+      <SourceImage condition="is">C:\Windows\System32\services.exe</SourceImage>
+      <SourceImage condition="is">C:\Windows\System32\svchost.exe</SourceImage>
+    </ProcessAccess>
+
+    <!-- EVENT ID 11: FileCreate -->
+    <!-- Monitor file creation in temp directories or startup directories (T1547.001, T1105) -->
+    <FileCreate onmatch="include">
+      <TargetFilename condition="contains">\AppData\Local\Temp\</TargetFilename>
+      <TargetFilename condition="contains">\Start Menu\Programs\Startup\</TargetFilename>
+      <TargetFilename condition="contains">C:\Windows\Temp\</TargetFilename>
+      <TargetFilename condition="contains">C:\Users\Public\</TargetFilename>
+    </FileCreate>
+
+    <!-- EVENT ID 12 & 13: RegistryEvent (Value Set & Key Rename) -->
+    <!-- Critical for Registry Run Key Persistence (T1547.001) -->
+    <RegistryEvent onmatch="include">
+      <!-- Monitor modifications to startup run keys -->
+      <TargetObject condition="contains">CurrentVersion\Run</TargetObject>
+      <TargetObject condition="contains">CurrentVersion\RunOnce</TargetObject>
+      <TargetObject condition="contains">Group Policy\Scripts</TargetObject>
+      <TargetObject condition="contains">Windows\System\Scripts</TargetObject>
+    </RegistryEvent>
+    <RegistryEvent onmatch="exclude">
+      <!-- Exclude noisy, legitimate system modifications -->
+      <Image condition="is">C:\Windows\System32\msiexec.exe</Image>
+    </RegistryEvent>
+
+    <!-- EVENT ID 22: DNSEvent (DNS Query) -->
+    <!-- Log DNS queries from script hosts and download tools to detect Command and Control (T1105) -->
+    <DnsQuery onmatch="include">
+      <Image condition="image">powershell.exe</Image>
+      <Image condition="image">cmd.exe</Image>
+      <Image condition="image">certutil.exe</Image>
+      <Image condition="image">bitsadmin.exe</Image>
+      <Image condition="image">wscript.exe</Image>
+      <Image condition="image">cscript.exe</Image>
+      <Image condition="image">mshta.exe</Image>
+      <Image condition="image">curl.exe</Image>
+    </DnsQuery>
+
+  </EventFiltering>
+</Sysmon>

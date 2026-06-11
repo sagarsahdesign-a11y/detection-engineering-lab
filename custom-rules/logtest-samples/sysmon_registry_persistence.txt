@@ -1,0 +1,1 @@
+{"win":{"system":{"eventID":"13","channel":"Microsoft-Windows-Sysmon/Operational","providerName":"Microsoft-Windows-Sysmon"},"eventdata":{"eventType":"SetValue","targetObject":"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Backdoor","details":"C:\\Windows\\Temp\\backdoor.exe"}}}

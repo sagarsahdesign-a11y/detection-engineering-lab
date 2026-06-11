@@ -91,6 +91,10 @@ Complete matrix: [`docs/mitre-attack-mapping.md`](docs/mitre-attack-mapping.md)
 ```
 detection-engineering-lab/
 ├── README.md                          # Project overview (this file)
+├── setup-lab.ps1                      # Windows endpoint setup automation script
+├── sysmon-config.xml                  # Tailored Sysmon configuration XML
+├── playbooks/
+│   └── triage-playbook.md             # SOC Incident Response Playbook
 ├── docs/
 │   ├── architecture.md                # Lab topology and data flow
 │   ├── mitre-attack-mapping.md        # ATT&CK coverage matrix
@@ -100,7 +104,7 @@ detection-engineering-lab/
 ├── screenshots/
 │   └── checklist.md                   # Required evidence screenshots
 ├── custom-rules/
-│   ├── local_rules.xml                # Custom Wazuh detection rules
+│   ├── local_rules.xml                # Upgraded Wazuh detection rules
 │   └── README.md                      # Rule deployment guide
 ├── sigma-rules/                       # 12 Sigma rules (YAML)
 ├── atomic-red-team-tests/
@@ -170,6 +174,32 @@ From [`reports/detection-gap-analysis.md`](reports/detection-gap-analysis.md):
 
 ---
 
+## Automated Lab Setup & Telemetry Configuration
+
+To simplify the deployment of required audit policies, logging facilities, and host telemetry, an automated script is provided.
+
+Run the setup script in an elevated PowerShell session:
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\setup-lab.ps1
+```
+
+This script automates:
+1. **Administrative Rights Verification**
+2. **Advanced Security Auditing**: Configures command-line auditing (Process Creation Event ID 4688), Logon Success/Failures, and User/Security Group Management.
+3. **PowerShell Logging Configuration**: Enables Module Logging (Event ID 4103) and Script Block Logging (Event ID 4104) in the Registry.
+4. **Sysmon Deployment**: Automatically downloads, extracts, and installs Microsoft Sysmon using the custom [`sysmon-config.xml`](sysmon-config.xml) configuration template.
+5. **Wazuh Agent Health Check**: Verifies and starts the Wazuh Agent service if disabled.
+
+---
+
+## SOC Incident Response Playbooks
+
+To bridge the gap between detection engineering and security operations, triage and incident response procedures are provided for SOC Analysts:
+* [`playbooks/triage-playbook.md`](playbooks/triage-playbook.md) — Step-by-step containment, triage, and investigation workflows for LSASS Credential Dumping, Process Injection, and Brute Force attacks.
+
+---
+
 ## Lab Prerequisites
 
 | Requirement | Version / Notes |
@@ -203,12 +233,9 @@ Place captured images in `screenshots/` using the naming convention defined in t
 
 ### Lab Evidence
 
-<!-- Uncomment after adding screenshots to screenshots/ -->
-<!-- ![Wazuh Alert Overview](screenshots/dashboard-alert-overview.png) -->
-<!-- ![T1003 LSASS Detection](screenshots/alert-T1003-lsass-access.png) -->
-<!-- ![ATT&CK Navigator Layer](screenshots/attack-navigator-layer.png) -->
-
-> **Portfolio tip:** Add at least 3 screenshots (dashboard, one high-severity alert, ATT&CK Navigator layer) then uncomment the lines above.
+![Wazuh Alert Overview](screenshots/dashboard-alert-overview.png)
+![T1003 LSASS Detection](screenshots/alert-T1003-lsass-access.png)
+![ATT&CK Navigator Layer](screenshots/attack-navigator-layer.png)
 
 ---
 

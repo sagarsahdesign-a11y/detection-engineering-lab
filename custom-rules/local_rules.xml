@@ -1,8 +1,8 @@
 <!--
   Detection Engineering Lab - Custom Wazuh Rules
   Deploy to: /var/ossec/etc/rules/local_rules.xml
-  Rule ID range: 100100-100111
-  Author: Detection Engineering Lab
+  Rule ID range: 100100-100115
+  Author: Detection Engineering Lab (Portfolio Upgrade)
 -->
 
 <group name="detection_engineering_lab,">
@@ -22,7 +22,7 @@
   <!-- T1059.001 - Suspicious PowerShell -->
   <rule id="100101" level="12">
     <field name="win.system.eventID">^4104$</field>
-    <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(-enc|-EncodedCommand|IEX|DownloadString|Invoke-Mimikatz|FromBase64String)</field>
+    <field name="win.eventdata.scriptBlockText" type="pcre2">(?i)(-enc|-EncodedCommand|IEX|DownloadString|Invoke-Mimikatz|FromBase64String|reflection\.assembly|marshal\.copy|[char]\[\]|virtualalloc)</field>
     <description>Suspicious PowerShell script block detected (T1059.001)</description>
     <mitre>
       <id>T1059</id>
@@ -33,8 +33,19 @@
 
   <rule id="1001011" level="12">
     <if_sid>61603</if_sid>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)(-enc|-EncodedCommand|DownloadString|IEX)</field>
-    <description>Suspicious PowerShell command line (T1059.001)</description>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(-enc|-EncodedCommand|-encoded|DownloadString|IEX|invoke-webrequest)</field>
+    <description>Suspicious PowerShell command line arguments (T1059.001)</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+    <group>powershell,windows,</group>
+  </rule>
+
+  <rule id="1001012" level="10">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(powershell|pwsh)\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)-ep\s+bypass|-executionpolicy\s+bypass|-nop|-noprofile|-w\s+hidden|-windowstyle\s+hidden</field>
+    <description>PowerShell executed with bypass or hidden execution flags (T1059.001)</description>
     <mitre>
       <id>T1059.001</id>
     </mitre>
@@ -77,6 +88,18 @@
     <group>credential_access,windows,</group>
   </rule>
 
+  <rule id="1001031" level="13">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\rundll32\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)comsvcs\.dll.*(MiniDump|#24)</field>
+    <description>rundll32.exe loading comsvcs.dll - LSASS memory dumping (T1003.001)</description>
+    <mitre>
+      <id>T1003.001</id>
+      <id>T1003</id>
+    </mitre>
+    <group>credential_access,windows,</group>
+  </rule>
+
   <!-- T1021.001 - RDP Logon -->
   <rule id="100104" level="8">
     <if_sid>60106</if_sid>
@@ -110,7 +133,7 @@
     <if_sid>61603</if_sid>
     <field name="win.eventdata.image" type="pcre2">(?i)\\certutil\.exe$</field>
     <field name="win.eventdata.commandLine" type="pcre2">(?i)(-urlcache|-verifyctl|-f\s+http)</field>
-    <description>certutil used to download file - Ingress tool transfer (T1105)</description>
+    <description>certutil.exe used to download files - Ingress tool transfer (T1105)</description>
     <mitre>
       <id>T1105</id>
     </mitre>
@@ -212,6 +235,18 @@
     <mitre>
       <id>T1055</id>
       <id>T1055.001</id>
+    </mitre>
+    <group>defense_evasion,windows,</group>
+  </rule>
+
+  <rule id="1001101" level="13">
+    <if_sid>61609</if_sid>
+    <field name="win.eventdata.targetImage" type="pcre2">(?i)\\(svchost|lsass|spoolsv|explorer)\.exe$</field>
+    <field name="win.eventdata.sourceImage" type="pcre2">!^(?i)C:\\Windows\\System32\\(csrss|winlogon|svchost)\.exe$</field>
+    <description>Suspicious CreateRemoteThread targeting system process (T1055.001)</description>
+    <mitre>
+      <id>T1055.001</id>
+      <id>T1055</id>
     </mitre>
     <group>defense_evasion,windows,</group>
   </rule>

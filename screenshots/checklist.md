@@ -21,14 +21,14 @@ screenshots/{category}-{technique}-{description}.png
 
 | # | Category | Description | Filename | Status |
 |---|----------|-------------|----------|--------|
-| 1 | Dashboard | Wazuh Dashboard — Security Events overview (last 24h) | `dashboard-alert-overview.png` | ☐ |
+| 1 | Dashboard | Wazuh Dashboard — Security Events overview (last 24h) | `dashboard-alert-overview.png` | ☑ |
 | 2 | Dashboard | Wazuh Dashboard — Top 10 alerts by rule | `dashboard-top-alerts.png` | ☐ |
-| 3 | Alert | T1003 LSASS access alert detail (rule 100103) | `alert-T1003-lsass-access.png` | ☐ |
+| 3 | Alert | T1003 LSASS access alert detail (rule 100103) | `alert-T1003-lsass-access.png` | ☑ |
 | 4 | Alert | T1110 Brute force alert detail (rule 100100) | `alert-T1110-brute-force.png` | ☐ |
 | 5 | Alert | T1136 Account creation alert (rule 100111) | `alert-T1136-account-creation.png` | ☐ |
 | 6 | Atomic | PowerShell window running `Invoke-AtomicTest` | `atomic-invoke-atomictest.png` | ☐ |
 | 7 | Atomic | T1059 PowerShell test output | `atomic-T1059-execution.png` | ☐ |
-| 8 | ATT&CK | MITRE ATT&CK Navigator layer (colored) | `attack-navigator-layer.png` | ☐ |
+| 8 | ATT&CK | MITRE ATT&CK Navigator layer (colored) | `attack-navigator-layer.png` | ☑ |
 | 9 | Rules | Custom Wazuh rule in Dashboard or XML editor | `rules-custom-wazuh-xml.png` | ☐ |
 | 10 | Rules | Sigma rule in repository or Sigma CLI conversion | `rules-sigma-conversion.png` | ☐ |
 

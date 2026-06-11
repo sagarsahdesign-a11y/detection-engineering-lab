@@ -1,0 +1,1 @@
+{"win":{"system":{"eventID":"8","channel":"Microsoft-Windows-Sysmon/Operational","providerName":"Microsoft-Windows-Sysmon"},"eventdata":{"sourceImage":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe","targetImage":"C:\\Windows\\System32\\svchost.exe","startAddress":"0x00007FF7B4BC1000"}}}

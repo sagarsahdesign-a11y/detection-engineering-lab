@@ -1,0 +1,1 @@
+{"win":{"system":{"eventID":"1","channel":"Microsoft-Windows-Sysmon/Operational","providerName":"Microsoft-Windows-Sysmon"},"eventdata":{"image":"C:\\Windows\\System32\\cmd.exe","commandLine":"cmd.exe /c calc.exe","parentImage":"C:\\Windows\\System32\\wbem\\WmiPrvSE.exe"}}}
