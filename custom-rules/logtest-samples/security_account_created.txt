@@ -1,0 +1,1 @@
+{"win":{"system":{"eventID":"4720","channel":"Security"},"eventdata":{"targetUserName":"eviluser","targetDomainName":"WORKSTATION","subjectUserName":"labadmin"}}}

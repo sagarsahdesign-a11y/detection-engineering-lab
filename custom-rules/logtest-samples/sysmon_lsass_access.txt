@@ -1,0 +1,1 @@
+{"win":{"system":{"eventID":"10","channel":"Microsoft-Windows-Sysmon/Operational"},"eventdata":{"sourceImage":"C:\\Tools\\procdump.exe","targetImage":"C:\\Windows\\System32\\lsass.exe","grantedAccess":"0x1410"}}}

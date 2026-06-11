@@ -1,0 +1,28 @@
+title: Process Injection via CreateRemoteThread
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567011
+status: experimental
+description: Detects CreateRemoteThread events indicative of process injection
+references:
+    - https://attack.mitre.org/techniques/T1055/001/
+author: Detection Engineering Lab
+date: 2025/06/11
+tags:
+    - attack.defense_evasion
+    - attack.privilege_escalation
+    - attack.t1055
+    - attack.t1055.001
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 8
+    filter_legit:
+        SourceImage|endswith:
+            - '\csrss.exe'
+            - '\winlogon.exe'
+    condition: selection and not filter_legit
+falsepositives:
+    - Security products performing code injection
+    - Some legitimate software behavior
+level: high

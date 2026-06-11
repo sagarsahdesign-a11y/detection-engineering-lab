@@ -1,0 +1,40 @@
+title: Ingress Tool Transfer via LOLBins
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567007
+status: experimental
+description: Detects file download using certutil, bitsadmin, or PowerShell web requests
+references:
+    - https://attack.mitre.org/techniques/T1105/
+author: Detection Engineering Lab
+date: 2025/06/07
+tags:
+    - attack.command_and_control
+    - attack.t1105
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection_certutil:
+        EventID: 1
+        Image|endswith: '\certutil.exe'
+        CommandLine|contains:
+            - '-urlcache'
+            - '-verifyctl'
+            - '-f http'
+    selection_bitsadmin:
+        EventID: 1
+        Image|endswith: '\bitsadmin.exe'
+        CommandLine|contains: '/transfer'
+    selection_powershell:
+        EventID: 1
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains:
+            - 'DownloadFile'
+            - 'DownloadString'
+            - 'Invoke-WebRequest'
+            - 'wget '
+            - 'curl '
+    condition: 1 of selection_*
+falsepositives:
+    - IT scripts using certutil for certificate management
+    - Software update mechanisms
+level: high

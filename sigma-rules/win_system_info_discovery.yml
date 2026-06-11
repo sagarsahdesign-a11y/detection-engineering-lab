@@ -1,0 +1,31 @@
+title: System Information Discovery Commands
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567008
+status: experimental
+description: Detects execution of system information discovery commands used during reconnaissance
+references:
+    - https://attack.mitre.org/techniques/T1082/
+author: Detection Engineering Lab
+date: 2025/06/08
+tags:
+    - attack.discovery
+    - attack.t1082
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 1
+        Image|endswith:
+            - '\systeminfo.exe'
+            - '\hostname.exe'
+            - '\whoami.exe'
+    filter_parent:
+        ParentImage|endswith:
+            - '\services.exe'
+            - '\svchost.exe'
+    condition: selection and not filter_parent
+falsepositives:
+    - Administrator troubleshooting
+    - Inventory and monitoring scripts
+    - Login scripts
+level: low

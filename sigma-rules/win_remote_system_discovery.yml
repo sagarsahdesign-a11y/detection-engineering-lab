@@ -1,0 +1,32 @@
+title: Remote System Discovery via Net and Nltest
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567009
+status: experimental
+description: Detects network and domain enumeration commands used for remote system discovery
+references:
+    - https://attack.mitre.org/techniques/T1018/
+author: Detection Engineering Lab
+date: 2025/06/09
+tags:
+    - attack.discovery
+    - attack.t1018
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection_net:
+        EventID: 1
+        Image|endswith: '\net.exe'
+        CommandLine|contains:
+            - ' view'
+            - ' group '
+    selection_nltest:
+        EventID: 1
+        Image|endswith: '\nltest.exe'
+        CommandLine|contains:
+            - '/dclist'
+            - '/dsgetdc'
+    condition: 1 of selection_*
+falsepositives:
+    - Domain administrators performing inventory
+    - IT helpdesk troubleshooting
+level: medium

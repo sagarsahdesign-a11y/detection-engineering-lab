@@ -1,0 +1,30 @@
+title: WMI Command Execution
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567010
+status: experimental
+description: Detects WMI being used to execute processes, a common fileless execution technique
+references:
+    - https://attack.mitre.org/techniques/T1047/
+author: Detection Engineering Lab
+date: 2025/06/10
+tags:
+    - attack.execution
+    - attack.t1047
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection_wmic:
+        EventID: 1
+        Image|endswith: '\wmic.exe'
+        CommandLine|contains: 'process call create'
+    selection_parent:
+        EventID: 1
+        ParentImage|endswith: '\WmiPrvSE.exe'
+        Image|endswith:
+            - '\cmd.exe'
+            - '\powershell.exe'
+    condition: 1 of selection_*
+falsepositives:
+    - SCCM and systems management tools
+    - Legitimate administrative WMI queries
+level: high

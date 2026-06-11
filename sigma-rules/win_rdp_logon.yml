@@ -1,0 +1,29 @@
+title: Remote Desktop Protocol Logon
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567005
+status: experimental
+description: Detects successful RDP logons (Logon Type 10) which may indicate lateral movement
+references:
+    - https://attack.mitre.org/techniques/T1021/001/
+author: Detection Engineering Lab
+date: 2025/06/05
+tags:
+    - attack.lateral_movement
+    - attack.t1021
+    - attack.t1021.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 10
+    filter_local:
+        IpAddress:
+            - '127.0.0.1'
+            - '::1'
+            - '-'
+    condition: selection and not filter_local
+falsepositives:
+    - IT administrators using RDP for legitimate management
+    - Jump server connections
+level: medium

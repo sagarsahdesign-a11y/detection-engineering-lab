@@ -1,0 +1,30 @@
+title: Registry Run Key Persistence
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567003
+status: experimental
+description: Detects modifications to Run/RunOnce registry keys used for persistence
+references:
+    - https://attack.mitre.org/techniques/T1547/001/
+author: Detection Engineering Lab
+date: 2025/06/03
+tags:
+    - attack.persistence
+    - attack.t1547
+    - attack.t1547.001
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection_registry:
+        EventID: 13
+        TargetObject|contains:
+            - '\CurrentVersion\Run'
+            - '\CurrentVersion\RunOnce'
+    selection_reg_exe:
+        EventID: 1
+        Image|endswith: '\reg.exe'
+        CommandLine|contains: 'CurrentVersion\Run'
+    condition: 1 of selection_*
+falsepositives:
+    - Software installers adding legitimate startup entries
+    - IT provisioning tools
+level: medium

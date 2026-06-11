@@ -1,0 +1,26 @@
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Secrets — never commit lab credentials
+.env
+*.pem
+*credentials*
+
+# Wazuh manager exports (may contain hostnames/IPs)
+*.log
+ossec.log
+
+# Scratch / local notes
+scratch/
+notes-private/
+
+# Optional: keep screenshot folder but ignore oversized raw dumps
+screenshots/raw/

@@ -1,0 +1,35 @@
+title: Suspicious Local Admin Interactive Logon
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567006
+status: experimental
+description: Detects interactive logon by local administrator accounts outside business hours or from unusual sources
+references:
+    - https://attack.mitre.org/techniques/T1078/003/
+author: Detection Engineering Lab
+date: 2025/06/06
+tags:
+    - attack.defense_evasion
+    - attack.persistence
+    - attack.privilege_escalation
+    - attack.initial_access
+    - attack.t1078
+    - attack.t1078.003
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType:
+            - 2
+            - 10
+        TargetUserName|endswith: 'admin'
+    filter_system:
+        TargetUserName:
+            - 'SYSTEM'
+            - 'LOCAL SERVICE'
+            - 'NETWORK SERVICE'
+    condition: selection and not filter_system
+falsepositives:
+    - Legitimate administrator logons during maintenance windows
+    - Lab environments with frequent admin access
+level: low

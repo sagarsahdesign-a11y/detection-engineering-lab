@@ -1,0 +1,25 @@
+title: Local User Account Created
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567012
+status: experimental
+description: Detects creation of new local user accounts which may indicate persistence
+references:
+    - https://attack.mitre.org/techniques/T1136/001/
+author: Detection Engineering Lab
+date: 2025/06/12
+tags:
+    - attack.persistence
+    - attack.t1136
+    - attack.t1136.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4720
+    filter_computer:
+        TargetUserName|endswith: '$'
+    condition: selection and not filter_computer
+falsepositives:
+    - Provisioning and onboarding scripts
+    - Software creating service accounts
+level: medium

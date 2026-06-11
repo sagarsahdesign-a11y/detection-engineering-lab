@@ -1,0 +1,33 @@
+title: LSASS Process Access - Credential Dumping
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567004
+status: experimental
+description: Detects process access to LSASS memory which may indicate credential dumping
+references:
+    - https://attack.mitre.org/techniques/T1003/001/
+author: Detection Engineering Lab
+date: 2025/06/04
+tags:
+    - attack.credential_access
+    - attack.t1003
+    - attack.t1003.001
+logsource:
+    product: windows
+    service: sysmon
+detection:
+    selection:
+        EventID: 10
+        TargetImage|endswith: '\lsass.exe'
+        GrantedAccess:
+            - '0x1010'
+            - '0x1410'
+            - '0x143A'
+            - '0x1fffff'
+    filter_legit:
+        SourceImage|endswith:
+            - '\WerFault.exe'
+            - '\WerFaultSecure.exe'
+    condition: selection and not filter_legit
+falsepositives:
+    - Security software scanning LSASS
+    - Windows Error Reporting in some configurations
+level: critical

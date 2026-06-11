@@ -1,0 +1,38 @@
+title: Suspicious PowerShell Encoded Command Execution
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567002
+status: experimental
+description: Detects PowerShell execution with encoded commands or download cradles commonly used in attacks
+references:
+    - https://attack.mitre.org/techniques/T1059/001/
+author: Detection Engineering Lab
+date: 2025/06/02
+tags:
+    - attack.execution
+    - attack.t1059
+    - attack.t1059.001
+logsource:
+    product: windows
+    service: powershell
+detection:
+    selection_encoded:
+        EventID: 4104
+        ScriptBlockText|contains:
+            - '-enc'
+            - '-EncodedCommand'
+            - 'IEX'
+            - 'DownloadString'
+            - 'Invoke-Mimikatz'
+            - 'FromBase64String'
+    selection_sysmon:
+        EventID: 1
+        Image|endswith: '\powershell.exe'
+        CommandLine|contains:
+            - '-enc'
+            - '-EncodedCommand'
+            - 'DownloadString'
+            - 'IEX'
+    condition: 1 of selection_*
+falsepositives:
+    - Legitimate admin scripts using encoded commands
+    - Software deployment tools
+level: high

